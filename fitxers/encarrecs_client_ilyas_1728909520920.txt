@@ -1,0 +1,5 @@
+Nom del client: ilyasTelefon del client: 23243243Data de l'encarrec: 23423
+Quantitat      Unitats    Article
+===========    ========   ===================
+343.0            u          hola
+4.0            34          rrrr
