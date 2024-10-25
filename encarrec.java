@@ -11,164 +11,24 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.Serializable;
 
-public class encarrec {
+import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream;
 
+
+public class encarrec implements Serializable{
+
+    private static final long serialVersionUID = 1L;
+ 
     private String nomClient;
     private String telef;
     private String data;
     private List<Article> articles = new ArrayList<>();
     private int preuTotalEncarrec = 0;
-
-    public void generarEncarrec() {
-        boolean mes = true;
-        System.out.println("Nom del client: ");
-        String nomCli = Utils.readLine();
-        this.nomClient = nomCli;
-        System.out.println("Telefon del client: ");
-        String tel = Utils.readLine();
-        this.telef = tel;
-        System.out.println("Data de l'encarrec: ");
-        String dat = Utils.readLine();
-        this.data = dat;
-
-        // Preguntem l'informació sobre l'article que vol
-        while (mes) {
-            Article nouArticle = new Article();
-            System.out.println("Quantitat d'articles: ");
-            Float quan = null;
-            try {
-                quan = Float.parseFloat(Utils.readLine());
-            } catch (NumberFormatException e) {
-                System.out.println("Error: has de introducir un número válido.");
-                e.printStackTrace();
-                continue;
-            }
-            nouArticle.setQuantitat(quan);
-            System.out.println("Unitat de l'article:  ");
-            String uni = Utils.readLine();
-            nouArticle.setUnitat(uni);
-            System.out.println("Nom de l’article: ");
-            String arti = Utils.readLine();
-            nouArticle.setNom(arti);
-            articles.add(nouArticle);
-            System.out.println("Vols afegir un nou article? ");
-            mes = Utils.respostaABoolean(Utils.readLine());
-        }
-
-        System.out.println(
-                "Introdueix el format amb el que vols generar el fitxer: \n 1 --> Fitxer amb format albarà \n 2 --> Fitxer amb format CSV \n 3 --> Fitxer amb format binari");
-        int input = Integer.parseInt(Utils.readLine());
-
-        while (input != 1 && input != 2 && input != 3) {
-            System.out.println("Opcio incorrecta, has d'escriure 1, 2 o 3");
-            System.out.println(
-                    "Introdueix el format amb el que vols generar el fitxer: \n 1 --> Fitxer amb format albarà \n 2 --> Fitxer amb format CSV \n 3 --> Fitxer amb format binari");
-            System.out.println("Selecciona una de les tres opcions (1, 2 o 3): ");
-            input = Integer.parseInt(Utils.readLine());
-        }
-        switch (input) {
-            case 1:
-                generarTxt();
-                break;
-            case 2:
-                generarCSV();
-                break;
-            case 3:
-                generarBinari();
-                break;
-        }
-    }
-
-    public void mostrarEncarrec() {
-
-        System.out.println(
-                "Introdueix el format amb el que vols mostrar el fitxer: \n 1 --> Fitxer amb format CSV \n 2 --> Fitxer amb format binari");
-        int input = Integer.parseInt(Utils.readLine());
-
-        while (input != 1 && input != 2) {
-            System.out.println("Opcio incorrecta, has d'escriure 1 o 2");
-            System.out.println(
-                    "Introdueix el format amb el que vols mostrar el fitxer: \n 1 --> Fitxer amb format CSV \n 2 --> Fitxer amb format binari");
-            input = Integer.parseInt(Utils.readLine());
-        }
-        System.out.println("Indica el nom del fitxer");
-        String nom = Utils.readLine();
-        String fileName = "/home/dani/M6-Ac1/fitxers/" + nom;
-        File fitxer = new File(fileName);
-        if (fitxer.exists()) {
-            switch (input) {
-                case 1:
-                    mostrarCSV(fitxer);
-                    break;
-                case 2:
-                    mostrarBinari(fitxer);
-                    break;
-            }
-        } else {
-            System.out.println("Fitxer no existent: " + fileName);
-        }
-
-    }
-
-    public void mostrarCSV(File fitxer) {
-        try {
-            BufferedReader lectura = new BufferedReader(new FileReader(fitxer));
-            String linea;
-            String[] clientInfo = {};
-            if ((linea = lectura.readLine()) != null) {
-                clientInfo = linea.split(";");
-            }
-            System.out.println("\nNom del client: " + clientInfo[0]);
-            System.out.println("Telefon del client: " + clientInfo[1]);
-            System.out.println("Data de l'encarrec: " + clientInfo[2]);
-            System.out.println();
-            System.out.println("Quantitat      Unitats    Article");
-            System.out.println("===========    ========   ===================");
-
-            while ((linea = lectura.readLine()) != null) {
-                String[] articles = linea.split(";");
-                System.out.println(articles[0] + "            " + articles[1] + "          "
-                        + articles[2]);
-            }
-            lectura.close();
-        } catch (IOException e) {
-            System.out.println("Error al crear el fitxer txt");
-            e.printStackTrace();
-        }
-    }
-
-    public void mostrarBinari(File fitxer) {
-        try {
-            FileInputStream fileStream = new FileInputStream(fitxer);
-            DataInputStream dataStream = new DataInputStream(fileStream);
-
-            System.out.println("\nNom del client: " + dataStream.readUTF());
-            System.out.println("Telefon del client: " + dataStream.readUTF());
-            System.out.println("Data de l'encarrec: " + dataStream.readUTF());
-            System.out.println();
-            System.out.println("Quantitat      Unitats    Article");
-            System.out.println("===========    ========   ===================");
-
-            int numArticles = dataStream.readInt();
-
-            for (int i = 0; i < numArticles; i++) {
-                float quantitat = dataStream.readFloat();
-                String unitat = dataStream.readUTF();
-                String nomArticle = dataStream.readUTF();
     
-                System.out.printf("%-12s    %-8s   %s%n", quantitat, unitat, nomArticle);
-            }
-            fileStream.close();
-            dataStream.close();
-        } catch (FileNotFoundException e) {
-            System.out.println("Fitxer binari no existent");
-            e.printStackTrace();
-        } catch (IOException e) {
-            System.out.println("Error al mostrar el fitxer bin");
-            e.printStackTrace();
-        }
-    }
+
+    
 
     public void generarTxt() {
         String fileName = "/home/dani/M6-Ac1/fitxers/" + "encarrecs_client_" + nomClient + "_"
@@ -263,4 +123,75 @@ public class encarrec {
         }
     }
 
+    public static long getSerialversionuid() {
+        return serialVersionUID;
+    }
+
+    public String getNomClient() {
+        return nomClient;
+    }
+
+    public void setNomClient(String nomClient) {
+        this.nomClient = nomClient;
+    }
+
+    public String getTelef() {
+        return telef;
+    }
+
+    public void setTelef(String telef) {
+        this.telef = telef;
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
+    }
+
+    public List<Article> getArticles() {
+        return articles;
+    }
+
+    public void setArticles(Article article) {
+        articles.add(article);
+    }
+
+    public int getPreuTotalEncarrec() {
+        return preuTotalEncarrec;
+    }
+
+    public void setPreuTotalEncarrec(int preuTotalEncarrec) {
+        this.preuTotalEncarrec = preuTotalEncarrec;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+    
+        builder.append("Nom del client: ").append(nomClient).append("\n")
+           .append("Telefon del client: ").append(telef).append("\n")
+           .append("Data de l'encarrec: ").append(data).append("\n\n")
+           .append("Quantitat      Unitats    Article\n")
+           .append("===========    ========   ===================\n");
+
+        for (Article art : articles) {
+            builder.append(String.format("%-12s    %-8s   %s%n", 
+                art.getQuantitat(), art.getUnitat(), art.getNom()));
+        }
+        return builder.toString();
+    }
+
+    // Serialització
+    public void escripturaerialitzable(String fitxer, ArrayList<encarrec> encarrecs) {
+        try (FileOutputStream fileOut = new FileOutputStream(fitxer, true);
+             ObjectOutputStream objOut = new ObjectOutputStream(fileOut)) {
+            objOut.writeObject(encarrecs);
+        } catch (IOException e) {
+            System.out.println("Error durant l'escriptura serialitzada: " + e.getMessage());
+        }
+    }
+    
 }
