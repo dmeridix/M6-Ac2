@@ -1,17 +1,10 @@
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.DataInputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
-import java.io.ObjectInputStream;
 
 public class Exportador {
+
     public void mostrarCSV(File fitxer) {
-        try {
-            BufferedReader lectura = new BufferedReader(new FileReader(fitxer));
+        try (BufferedReader lectura = new BufferedReader(new FileReader(fitxer))) {
             String linea;
             String[] clientInfo = {};
             if ((linea = lectura.readLine()) != null) {
@@ -21,61 +14,55 @@ public class Exportador {
             System.out.println("Telefon del client: " + clientInfo[1]);
             System.out.println("Data de l'encarrec: " + clientInfo[2]);
             System.out.println();
-            System.out.println("Quantitat      Unitats    Article");
-            System.out.println("===========    ========   ===================");
+            System.out.println("Quantitat      Unitats    Article               Preu Unitari");
+            System.out.println("===========    ========   ===================   ============");
 
             while ((linea = lectura.readLine()) != null) {
                 String[] articles = linea.split(";");
-                System.out.println(articles[0] + "            " + articles[1] + "          "
-                        + articles[2]);
+                System.out.printf("%-12s    %-8s   %-20s   %.2f%n",
+                        articles[0], articles[1], articles[2], Float.parseFloat(articles[3]));
             }
-            lectura.close();
         } catch (IOException e) {
-            System.out.println("Error al crear el fitxer txt");
+            System.out.println("Error al llegir el fitxer CSV");
             e.printStackTrace();
         }
     }
 
     public void mostrarBinari(File fitxer) {
-        try {
-            FileInputStream fileStream = new FileInputStream(fitxer);
-            DataInputStream dataStream = new DataInputStream(fileStream);
-
+        try (DataInputStream dataStream = new DataInputStream(new FileInputStream(fitxer))) {
             System.out.println("\nNom del client: " + dataStream.readUTF());
             System.out.println("Telefon del client: " + dataStream.readUTF());
             System.out.println("Data de l'encarrec: " + dataStream.readUTF());
             System.out.println();
-            System.out.println("Quantitat      Unitats    Article");
-            System.out.println("===========    ========   ===================");
+            System.out.println("Quantitat      Unitats    Article               Preu Unitari");
+            System.out.println("===========    ========   ===================   ============");
 
             int numArticles = dataStream.readInt();
-
             for (int i = 0; i < numArticles; i++) {
                 float quantitat = dataStream.readFloat();
                 String unitat = dataStream.readUTF();
                 String nomArticle = dataStream.readUTF();
-    
-                System.out.printf("%-12s    %-8s   %s%n", quantitat, unitat, nomArticle);
+                float preuUnitari = dataStream.readFloat();
+
+                System.out.printf("%-12s    %-8s   %-20s   %.2f%n", quantitat, unitat, nomArticle, preuUnitari);
             }
-            fileStream.close();
-            dataStream.close();
         } catch (FileNotFoundException e) {
             System.out.println("Fitxer binari no existent");
             e.printStackTrace();
         } catch (IOException e) {
-            System.out.println("Error al mostrar el fitxer bin");
+            System.out.println("Error al mostrar el fitxer binari");
             e.printStackTrace();
         }
     }
-    public void lecturaSerelialitzable(String fitxer) {
-        ArrayList<encarrec> llista = null; 
-        try (FileInputStream fileIn = new FileInputStream(fitxer);
-            ObjectInputStream objOut = new ObjectInputStream(fileIn)) {
-                llista = (ArrayList<encarrec>)objOut.readObject();
-            for(encarrec encarrec : llista){
-                System.out.println(encarrec);
+
+    public void lecturaSerialitzada(String fitxer) {
+        ArrayList<encarrec> llista = null;
+        try (ObjectInputStream objIn = new ObjectInputStream(new FileInputStream(fitxer))) {
+            llista = (ArrayList<encarrec>) objIn.readObject();
+            for (encarrec enc : llista) {
+                System.out.println(enc);
             }
-        } catch (Exception e) {
+        } catch (IOException | ClassNotFoundException e) {
             System.out.println("Error durant la lectura serialitzada: " + e.getMessage());
         }
     }

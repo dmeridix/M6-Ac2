@@ -1,14 +1,13 @@
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-public class Article implements Serializable{
-    
+public class Article implements Serializable {
     private static final long serialVersionUID = 1L;
-
     private String nom;
     private float quantitat;
     private String unitat;
     private float preu;
-
 
     public Article(String nom, float quantitat, String unitat, float preu) {
         this.nom = nom;
@@ -16,6 +15,7 @@ public class Article implements Serializable{
         this.unitat = unitat;
         this.preu = preu;
     }
+
     public Article() {
         this.nom = "";
         this.quantitat = 0;
@@ -61,6 +61,6 @@ public class Article implements Serializable{
     }
 
     public String toCSV(){
-        return this.quantitat + ";" + this.unitat + ";" + this.nom + ";" ;
+        return this.quantitat + ";" + this.unitat + ";" + this.nom + ";";
     }
 }

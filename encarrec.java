@@ -1,130 +1,30 @@
-import java.io.BufferedWriter;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.io.Serializable;
 
-import java.io.ObjectOutputStream;
-import java.io.ObjectInputStream;
-
-
-public class encarrec implements Serializable{
+public class encarrec implements Serializable {
 
     private static final long serialVersionUID = 1L;
- 
+    private int idEncarrec;
     private String nomClient;
     private String telef;
     private String data;
     private List<Article> articles = new ArrayList<>();
-    private int preuTotalEncarrec = 0;
-    
+    private float preuTotal;
 
-    
-
-    public void generarTxt() {
-        String fileName = "/home/dani/M6-Ac1/fitxers/" + "encarrecs_client_" + nomClient + "_"
-                + System.currentTimeMillis() + ".txt";
-        File fitxer = new File(fileName);
-        if (fitxer.exists()) {
-            System.out.println("Fitxer ja existent: " + fileName);
-        } else {
-            try {
-                if (fitxer.createNewFile()) {
-                    BufferedWriter escriptura = new BufferedWriter(new FileWriter(fitxer));
-                    escriptura.write("Nom del client: " + nomClient);
-                    escriptura.write("Telefon del client: " + telef);
-                    escriptura.write("Data de l'encarrec: " + data);
-                    escriptura.write("\n");
-
-                    escriptura.write("Quantitat      Unitats    Article\n");
-                    escriptura.write("===========    ========   ===================\n");
-
-                    for (Article art : articles) {
-                        escriptura.write(art.getQuantitat() + "            " + art.getUnitat() + "          "
-                                + art.getNom() + "\n");
-                    }
-                    escriptura.close();
-                    System.out.println("El fitxer txt s'ha escrit correctament.");
-                }
-            } catch (IOException e) {
-                System.out.println("Error al crear el fitxer txt");
-                e.printStackTrace();
-            }
-        }
-
-    }
-
-    public void generarCSV() {
-        String fileName = "/home/dani/M6-Ac1/fitxers/" + "encarrecs_client_" + nomClient + "_"
-                + System.currentTimeMillis() + ".csv";
-        File fitxer = new File(fileName);
-        if (fitxer.exists()) {
-            System.out.println("Fitxer ja esxistent: " + fileName);
-        } else {
-            try {
-                if (fitxer.createNewFile()) {
-                    BufferedWriter escriptura = new BufferedWriter(new FileWriter(fitxer));
-                    escriptura.write(nomClient + ';' + telef + ';' + data + ';' + '\n');
-
-                    for (Article art : articles) {
-                        escriptura.write(art.toCSV() + '\n');
-                    }
-                    escriptura.close();
-                    System.out.println("El fitxer csv s'ha escrit correctament.");
-                }
-            } catch (IOException e) {
-                System.out.println("Error al crear el fitxer csv");
-                e.printStackTrace();
-            }
+    public void calcularPreuTotal() {
+        preuTotal = 0;
+        for (Article art : articles) {
+            preuTotal += art.getQuantitat() * art.getPreu();
         }
     }
 
-    public void generarBinari() {
-        String fileName = "/home/dani/M6-Ac1/fitxers/" + "encarrecs_client_" + nomClient + "_"
-                + System.currentTimeMillis() + ".dat";
-        File fitxer = new File(fileName);
-        if (fitxer.exists()) {
-            System.out.println("Fitxer ja esxistent: " + fileName);
-        } else {
-            try {
-                FileOutputStream fileStream = new FileOutputStream(fileName);
-                DataOutputStream stram = new DataOutputStream(fileStream);
-                stram.writeUTF(nomClient);
-                stram.writeUTF(telef);
-                stram.writeUTF(data);
-
-                stram.writeInt(articles.size());
-
-                for (Article art : articles) {
-                    stram.writeFloat(art.getQuantitat());
-                    stram.writeUTF(art.getUnitat());
-                    stram.writeUTF(art.getNom());
-                }
-
-                stram.close();
-                fileStream.close();
-                System.out.println("El fitxer binari s'ha escrit correctament.");
-            } catch (FileNotFoundException e) {
-                System.out.println("Fitxer no existent");
-                e.printStackTrace();
-            } catch (IOException e) {
-                System.out.println("Error al crear el fitxer binari");
-                e.printStackTrace();
-            }
-        }
+    public int getIdEncarrec() {
+        return idEncarrec;
     }
 
-    public static long getSerialversionuid() {
-        return serialVersionUID;
+    public void setIdEncarrec(int idEncarrec) {
+        this.idEncarrec = idEncarrec;
     }
 
     public String getNomClient() {
@@ -159,39 +59,27 @@ public class encarrec implements Serializable{
         articles.add(article);
     }
 
-    public int getPreuTotalEncarrec() {
-        return preuTotalEncarrec;
-    }
-
-    public void setPreuTotalEncarrec(int preuTotalEncarrec) {
-        this.preuTotalEncarrec = preuTotalEncarrec;
+    public float getPreuTotal() {
+        return preuTotal;
     }
 
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-    
-        builder.append("Nom del client: ").append(nomClient).append("\n")
-           .append("Telefon del client: ").append(telef).append("\n")
-           .append("Data de l'encarrec: ").append(data).append("\n\n")
-           .append("Quantitat      Unitats    Article\n")
-           .append("===========    ========   ===================\n");
+        calcularPreuTotal();
+        builder.append("ID de l'encàrrec: ").append(idEncarrec).append("\n")
+            .append("Nom del client: ").append(nomClient).append("\n")
+               .append("Telefon del client: ").append(telef).append("\n")
+               .append("Data de l'encarrec: ").append(data).append("\n\n")
+               .append("Quantitat      Unitats    Article              Preu Unitari\n")
+               .append("===========    ========   ===================   ============\n");
 
         for (Article art : articles) {
-            builder.append(String.format("%-12s    %-8s   %s%n", 
-                art.getQuantitat(), art.getUnitat(), art.getNom()));
+            builder.append(String.format("%-12s    %-8s   %-20s   %.2f%n",
+                    art.getQuantitat(), art.getUnitat(), art.getNom(), art.getPreu()));
         }
+
+        builder.append("\nPreu total del encàrrec: ").append(String.format("%.2f", preuTotal)).append(" €\n");
         return builder.toString();
     }
-
-    // Serialització
-    public void escripturaerialitzable(String fitxer, ArrayList<encarrec> encarrecs) {
-        try (FileOutputStream fileOut = new FileOutputStream(fitxer, true);
-             ObjectOutputStream objOut = new ObjectOutputStream(fileOut)) {
-            objOut.writeObject(encarrecs);
-        } catch (IOException e) {
-            System.out.println("Error durant l'escriptura serialitzada: " + e.getMessage());
-        }
-    }
-    
 }
