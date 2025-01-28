@@ -1,4 +1,4 @@
-# M6-Ac1
+# M6-Ac2
 # Gestió d'Encàrrecs
 
 Aquest programa en Java permet gestionar encàrrecs de clients, oferint la possibilitat de generar i mostrar fitxers amb la informació dels encàrrecs en diferents formats (albarà, CSV o binari).
